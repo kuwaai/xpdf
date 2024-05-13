@@ -51,7 +51,7 @@ jobs:
 
       - name: Package
         run: |
-          $src = ".\build"
+          $src = ".\build\xpdf\"
           $licenses = @(".\COPYING", ".\COPYING3")
           $dst = ".\dist\xpdf-tools-$env:VERSION-$env:OS-$env:ARCH"
           $dst_file = $dst + ".zip"
