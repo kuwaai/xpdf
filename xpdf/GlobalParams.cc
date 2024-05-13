@@ -141,7 +141,7 @@ struct Base14FontInfo {
 
 GlobalParams *globalParams = NULL;
 
-const char *GlobalParams::defaultTextEncoding = "Latin1";
+const char *GlobalParams::defaultTextEncoding = "UTF-8";
 
 //------------------------------------------------------------------------
 // PSFontParam16
