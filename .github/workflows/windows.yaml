@@ -27,8 +27,13 @@ jobs:
         shell: pwsh
     strategy:
       matrix:
-        arch: [x64]
+        arch: [x64, x86]
         config: [Release]
+    
+    env:
+      VERSION: ${{ inputs.version }}
+      ARCH: ${{ matrix.arch }}
+    
     steps:
       - uses: actions/checkout@v3
       - name: Set up nmake
@@ -42,13 +47,22 @@ jobs:
           cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=${{ matrix.config }}
           nmake
           popd
+
+      - name: Package
+        run: |
+          mkdir dist
+          pushd dist
+          mkdir bin
+          cp ..\build\xpdf\*.exe bin\
+          Compress-Archive -Path .\bin -DestinationPath xpdf-$env:VERSION-$envARCH.zip
+          popd
           
       - name: Upload files to a GitHub release
         id: upload-release
         uses: svenstaro/upload-release-action@2.7.0
         continue-on-error: true
         with:
-          file: ./build/xpdf/*.exe
+          file: ./dist/*.zip
           tag: ${{ inputs.version }}
           file_glob: true
           make_latest: false
@@ -58,4 +72,4 @@ jobs:
         if: steps.upload-release.outcome == 'failure'
         with:
           name: ${{ inputs.version }}
-          path: ./build/xpdf/*.exe
+          path: ./dist/*.zip
