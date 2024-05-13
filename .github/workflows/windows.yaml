@@ -27,12 +27,12 @@ jobs:
         shell: pwsh
     strategy:
       matrix:
-        arch: [x64, Win32]
+        arch: [x64]
         config: [Release]
     steps:
       - uses: actions/checkout@v3
       - name: Set up nmake
-        uses: ilammy/msvc-d...@v1.10.0
+        uses: ilammy/msvc-dev-cmd@v1.13.0
         with:
           arch: ${{ matrix.arch }}
       - name: Build
