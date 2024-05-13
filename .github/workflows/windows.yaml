@@ -50,9 +50,9 @@ jobs:
 
       - name: Package
         run: |
-          $src = .\build
-          $dst = .\dist\xpdf-$env:VERSION-$env:ARCH
-          $dst_file = .\dist\xpdf-$env:VERSION-$env:ARCH.zip
+          $src = ".\build"
+          $licenses = @{".\COPYING", ".\COPYING3"}
+          $dst = ".\dist\xpdf-tools-$env:VERSION-$env:ARCH"
 
           New-Item -ItemType Directory -Path $dst\bin
 
@@ -61,8 +61,9 @@ jobs:
 
           #Copies all the items to the specified destination
           $list | Copy-Item -Destination $dst\bin\
+          $licenses | Copy-Item -Destination $dst\
 
-          Compress-Archive -Path $dst -DestinationPath $dst_file
+          Compress-Archive -Path $dst -DestinationPath $dst.zip
           
       - name: Upload files to a GitHub release
         id: upload-release
