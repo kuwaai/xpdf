@@ -33,7 +33,7 @@ jobs:
     env:
       VERSION: ${{ inputs.version }}
       ARCH: ${{ matrix.arch }}
-      PLATFORM: win
+      OS: win
     
     steps:
       - uses: actions/checkout@v3
@@ -53,17 +53,18 @@ jobs:
         run: |
           $src = ".\build"
           $licenses = @(".\COPYING", ".\COPYING3")
-          $dst = ".\dist\xpdf-tools-$env:VERSION-$env:PLATFORM-$env:ARCH"
+          $dst = ".\dist\xpdf-tools-$env:VERSION-$env:OS-$env:ARCH"
           $dst_file = $dst + ".zip"
 
           $bin_dir = "bin" + $env:ARCH.replace('x','')
           New-Item -ItemType Directory -Path $dst\$bin_dir
 
           #Filters by extension .exe
-          $list = $src | where {$_.extension -eq ".exe"}
+          $files = get-childitem $src -recurse
+          $exes = $files | where {$_.extension -eq ".exe"}
 
           #Copies all the items to the specified destination
-          $list | Copy-Item -Destination $dst\$bin_dir\
+          $exes | Copy-Item -Destination $dst\$bin_dir\
           $licenses | Copy-Item -Destination $dst\
 
           Compress-Archive -Path $dst -DestinationPath $dst_file
