@@ -33,6 +33,7 @@ jobs:
     env:
       VERSION: ${{ inputs.version }}
       ARCH: ${{ matrix.arch }}
+      PLATFORM: win
     
     steps:
       - uses: actions/checkout@v3
@@ -51,8 +52,8 @@ jobs:
       - name: Package
         run: |
           $src = ".\build"
-          $licenses = @{".\COPYING", ".\COPYING3"}
-          $dst = ".\dist\xpdf-tools-$env:VERSION-$env:ARCH"
+          $licenses = @(".\COPYING", ".\COPYING3")
+          $dst = ".\dist\xpdf-tools-$env:VERSION-$env:PLATFORM-$env:ARCH"
 
           New-Item -ItemType Directory -Path $dst\bin
 
