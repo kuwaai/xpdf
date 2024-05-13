@@ -1,0 +1,61 @@
+name: Build Windows Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to release'
+        default: '4.05-kuwa1'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version tag to release'
+        default: '4.05-kuwa1'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    strategy:
+      matrix:
+        arch: [x64, Win32]
+        config: [Release]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up nmake
+        uses: ilammy/msvc-d...@v1.10.0
+        with:
+          arch: ${{ matrix.arch }}
+      - name: Build
+        run: |
+          mkdir build
+          pushd build
+          cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=${{ matrix.config }}
+          nmake
+          popd
+          
+      - name: Upload files to a GitHub release
+        id: upload-release
+        uses: svenstaro/upload-release-action@2.7.0
+        continue-on-error: true
+        with:
+          file: ./build/xpdf/*.exe
+          tag: ${{ inputs.version }}
+          file_glob: true
+          make_latest: false
+          overwrite: true
+        
+      - uses: actions/upload-artifact@v3
+        if: steps.upload-release.outcome == 'failure'
+        with:
+          name: ${{ inputs.version }}
+          path: ./build/xpdf/*.exe
