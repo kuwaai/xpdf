@@ -50,12 +50,19 @@ jobs:
 
       - name: Package
         run: |
-          mkdir dist
-          pushd dist
-          mkdir bin
-          cp ..\build\xpdf\*.exe bin\
-          Compress-Archive -Path .\bin -DestinationPath xpdf-$env:VERSION-$envARCH.zip
-          popd
+          $src = .\build
+          $dst = .\dist\xpdf-$env:VERSION-$env:ARCH
+          $dst_file = .\dist\xpdf-$env:VERSION-$env:ARCH.zip
+
+          New-Item -ItemType Directory -Path $dst\bin
+
+          #Filters by extension .exe
+          $list = $src | where {$_.extension -eq ".exe"}
+
+          #Copies all the items to the specified destination
+          $list | Copy-Item -Destination $dst\bin\
+
+          Compress-Archive -Path $dst -DestinationPath $dst_file
           
       - name: Upload files to a GitHub release
         id: upload-release
