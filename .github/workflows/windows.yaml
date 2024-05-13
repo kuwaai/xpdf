@@ -64,7 +64,7 @@ jobs:
           $list | Copy-Item -Destination $dst\bin\
           $licenses | Copy-Item -Destination $dst\
 
-          Compress-Archive -Path $dst -DestinationPath $dst.zip
+          Compress-Archive -Path $dst -DestinationPath $dst + ".zip"
           
       - name: Upload files to a GitHub release
         id: upload-release
